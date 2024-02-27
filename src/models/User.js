@@ -16,12 +16,11 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
-    tech: {
-        created_at: {type: Date, default: new Date().toUTCString()},
-        updated_at: {type: Date, default: new Date().toUTCString()},
-        deleted_at: {type: Date, default: null},
+    deletedAt: {
+        type: Date,
+        default: null
     }
-})
+}, {timestamps: true})
 
 userSchema.pre('save', async function (next) {
     const hashedPassword = await hashPassword(this.password)
@@ -37,15 +36,12 @@ userSchema.pre('findOneAndUpdate', async function (next) {
 })
 
 userSchema.pre('find', async function (next) {
-    this.where({'tech.deleted_at': null})
+    this.where({deletedAt: null})
     next()
 })
-
 userSchema.pre('findOne', async function (next) {
-    this.where({'tech.deleted_at': null})
-    next()
+    this.where({deletedAt: null})
 })
-
 
 const User = model("User", userSchema, 'users')
 

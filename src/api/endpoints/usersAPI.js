@@ -4,13 +4,13 @@ const getUsersList = require("./../../services/getUsersList.js");
 const getUser = require("./../../services/getUser.js");
 const signup = require("./../../services/signup.js");
 const update = require("./../../services/update.js");
-const getUserTech = require("./../../services/getUserTech.js");
-const deleteUser = require("./../../services/deleteUser.js")
+const deleteUser = require("./../../services/deleteUser.js");
+const getUserTech = require('./../../services/getUserTech.js')
 const {
   createValidator,
   updateValidator,
 } = require("./../../validation/userValidation.js");
-const auth = require("./../../services/auth.js");
+const auth = require("../../middlwares/auth.js");
 
 const usersAPI = Router();
 
@@ -36,8 +36,8 @@ usersAPI.get("/api/users", async (req, res) => {
 usersAPI.get("/api/users/:id", async (req, res) => {
   try {
     const user = await getUser(req.params.id);
-    const userTech = await getUserTech(req.params.id);
-    res.setHeader("Last-Modified", userTech.updated_at).send(user);
+    const {updatedAt} = await getUserTech(req.params.id)
+    res.setHeader("Last-Modified", updatedAt).send(user);
   } catch (erorr) {
     res.status(404).send("User not found");
   }
@@ -56,8 +56,8 @@ usersAPI.post("/api/users", createValidator, async (req, res) => {
 usersAPI.put("/api/users/:id", auth, updateValidator, async (req, res) => {
   try {
     const ifUnmodifiedSince = new Date(req.headers["if-unmodified-since"]);
-    const userTech = await getUserTech(req.params.id);
-    if (ifUnmodifiedSince && ifUnmodifiedSince > userTech.updated_at) {
+    const {updatedAt} = await getUserTech(req.params.id);
+    if (ifUnmodifiedSince && ifUnmodifiedSince > updatedAt) {
       return res.status(412).send("Precondition failed");
     }
     await update(req.params.id, req.body);

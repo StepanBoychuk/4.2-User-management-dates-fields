@@ -1,5 +1,5 @@
-const User = require("./../models/User.js");
-const hashPassword = require("./../services/hashPassword.js");
+const User = require("../models/User.js");
+const hashPassword = require("../services/hashPassword.js");
 
 
 const auth = async (req, res, next) => {
